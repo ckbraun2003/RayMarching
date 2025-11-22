@@ -26,6 +26,7 @@ std::string loadShaderSource(const char* filePath) {
 GpuRayTracer::GpuRayTracer() {}
 
 GpuRayTracer::~GpuRayTracer() {
+    cleanupFramebuffer();
     glDeleteVertexArrays(1, &quadVAO);
     glDeleteBuffers(1, &quadVBO);
     glDeleteProgram(shaderProgram);
@@ -104,6 +105,19 @@ void GpuRayTracer::setupShaders(const std::string& fragmentShaderPath) {
 }
 
 void GpuRayTracer::render(const Camera& camera, const World& world, int width, int height, float time) {
+    // Bind framebuffer if it exists
+    if (fbo != 0) {
+        // Resize if needed
+        if (fboWidth != width || fboHeight != height) {
+            resizeFramebuffer(width, height);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glViewport(0, 0, width, height);
+    }
+    
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
     glUseProgram(shaderProgram);
     glBindVertexArray(quadVAO);
     
@@ -133,4 +147,78 @@ void GpuRayTracer::render(const Camera& camera, const World& world, int width, i
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
+    
+    // Unbind framebuffer
+    if (fbo != 0) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+}
+
+void GpuRayTracer::initFramebuffer(int width, int height) {
+    cleanupFramebuffer();
+    
+    fboWidth = width;
+    fboHeight = height;
+    
+    // Create framebuffer
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    
+    // Create texture for color attachment
+    glGenTextures(1, &fboTexture);
+    glBindTexture(GL_TEXTURE_2D, fboTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTexture, 0);
+    
+    // Create renderbuffer for depth/stencil (optional, but good practice)
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+    
+    // Check framebuffer completeness
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GpuRayTracer::resizeFramebuffer(int width, int height) {
+    if (width <= 0 || height <= 0) return;
+    initFramebuffer(width, height);
+}
+
+void GpuRayTracer::cleanupFramebuffer() {
+    if (fbo != 0) {
+        glDeleteFramebuffers(1, &fbo);
+        fbo = 0;
+    }
+    if (fboTexture != 0) {
+        glDeleteTextures(1, &fboTexture);
+        fboTexture = 0;
+    }
+    if (rbo != 0) {
+        glDeleteRenderbuffers(1, &rbo);
+        rbo = 0;
+    }
+}
+
+void GpuRayTracer::setMaxSteps(int steps) {
+    glUseProgram(shaderProgram);
+    // Note: This would require modifying the shader to use a uniform instead of #define
+    // For now, this is a placeholder - we'd need to update the shader
+}
+
+void GpuRayTracer::setMaxDistance(float distance) {
+    glUseProgram(shaderProgram);
+    // Similar to above - placeholder for future shader updates
+}
+
+void GpuRayTracer::setBendingStrength(float strength) {
+    glUseProgram(shaderProgram);
+    // This one we can implement since bending strength is already in the shader logic
+    // We'd need to pass it as a uniform
 }

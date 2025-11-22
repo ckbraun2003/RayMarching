@@ -11,7 +11,6 @@ public:
 
     // Callbacks
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-    static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
     
     // Input processing
     void processInput(GLFWwindow* window, float deltaTime);
@@ -22,6 +21,11 @@ public:
 
     // Setters
     void setFirstMouse(bool firstMouse);
+    
+    // UI Mode control
+    bool isUIMode() const { return uiMode; }
+    void setUIMode(bool mode) { uiMode = mode; }
+    void toggleUIMode() { uiMode = !uiMode; }
 
 private:
     Camera& camera;
@@ -30,6 +34,8 @@ private:
     bool firstMouse;
     bool useGpu = true;
     bool gKeyPressed = false; // Debounce for toggle key
+    bool uiMode = false; // false = Viewport mode, true = UI mode
+    bool tabKeyPressed = false; // Debounce for UI mode toggle
 
     // Static instance pointer for callbacks to access member data
     static EventHandler* instance;

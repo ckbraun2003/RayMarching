@@ -17,7 +17,7 @@ target_link_libraries(RayTracingEngineTests PRIVATE
     gtest
     glm::glm
     glfw
-    glad::glad
+    glad
 )
 
 # Discover tests

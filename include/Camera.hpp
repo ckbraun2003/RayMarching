@@ -43,6 +43,13 @@ public:
 
     // Process mouse movement to update camera orientation
     void processMouse(float xoffset, float yoffset, bool constrainPitch = true);
+    
+    // Setters for UI control
+    void setPosition(const glm::vec3& pos) { position = pos; }
+    void setYaw(float y) { yaw = y; updateCameraVectors(); }
+    void setPitch(float p) { pitch = p; updateCameraVectors(); }
+    void setMovementSpeed(float speed) { movementSpeed = speed; }
+    void setMouseSensitivity(float sensitivity) { mouseSensitivity = sensitivity; }
 
 private:
     // Calculates the front vector from camera's updated Euler angles
