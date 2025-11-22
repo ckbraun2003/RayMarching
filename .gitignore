@@ -1,0 +1,16 @@
+# Build
+out/
+build/
+.vs/
+*.exe
+*.lib
+*.pdb
+*.obj
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
