@@ -3,7 +3,7 @@
 project(RayTracingEngine)
 
 # Optional: Set toolchain if running via command line
-include("C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake")
+# Note: Pass -DCMAKE_TOOLCHAIN_FILE=[path/to/vcpkg]/scripts/buildsystems/vcpkg.cmake when configuring
 
 # Find libraries via vcpkg
 find_package(glfw3 CONFIG REQUIRED)
