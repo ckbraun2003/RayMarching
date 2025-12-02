@@ -1,6 +1,6 @@
-# Ray Tracing Engine
+# Ray Marching
 
-A relativistic ray tracing engine simulating a Schwarzschild Black Hole.
+A relativistic ray marching simulating a Schwarzschild Black Hole.
 
 ## Features
 - **General Relativity**: Simulates light bending (geodesics) around a black hole.
